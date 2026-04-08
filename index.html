@@ -3,29 +3,48 @@
 <head>
   <title>Playback - Spotify Auth</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { background: #121212; color: #fff; font-family: sans-serif; text-align: center; padding: 40px 20px; }
+    button { background: #1DB954; color: #fff; border: none; padding: 14px 28px; font-size: 16px; border-radius: 24px; margin-top: 20px; }
+  </style>
 </head>
 <body>
-  <p>Connecting to Spotify...</p>
+  <p id="status">Connecting to Spotify...</p>
   <script>
     var hash = window.location.hash.substring(1);
     if (hash) {
       var params = {};
-      hash.split('&').forEach(function(part) {
-        var kv = part.split('=');
+      var parts = hash.split('&');
+      for (var i = 0; i < parts.length; i++) {
+        var kv = parts[i].split('=');
         params[kv[0]] = decodeURIComponent(kv[1]);
-      });
+      }
       if (params.access_token) {
         var result = JSON.stringify({
           token: params.access_token,
           expiresIn: parseInt(params.expires_in, 10) || 3600
         });
-        document.body.innerHTML = '<p>Success! Returning to Pebble...</p>';
-        window.location = 'pebblejs://close#' + encodeURIComponent(result);
+        var closeUrl = 'pebblejs://close#' + encodeURIComponent(result);
+
+        document.getElementById('status').textContent = 'Logged in! Returning to Pebble...';
+
+        // Delay slightly to let the page settle before triggering pebblejs://close
+        setTimeout(function() {
+          document.location.href = closeUrl;
+        }, 300);
+
+        // Fallback button if auto-close doesn't work
+        setTimeout(function() {
+          var btn = document.createElement('button');
+          btn.textContent = 'Tap here to return to Pebble';
+          btn.onclick = function() { document.location.href = closeUrl; };
+          document.body.appendChild(btn);
+        }, 2000);
       } else if (params.error) {
-        document.body.innerHTML = '<p>Auth error: ' + params.error + '</p>';
+        document.getElementById('status').textContent = 'Auth error: ' + params.error;
       }
     } else {
-      document.body.innerHTML = '<p>No token received. Please try again from the Pebble app.</p>';
+      document.getElementById('status').textContent = 'No token received. Please try again from the Pebble app.';
     }
   </script>
 </body>
