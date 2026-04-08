@@ -21,6 +21,14 @@
     var REDIRECT_URI = 'https://alex523ap.github.io/playback_config/';
     var SCOPES = 'user-read-playback-state user-modify-playback-state user-read-currently-playing playlist-read-private user-library-read user-follow-read';
 
+    // Debug: show what URL we received
+    var debugEl = document.createElement('p');
+    debugEl.style.fontSize = '10px';
+    debugEl.style.color = '#888';
+    debugEl.style.wordBreak = 'break-all';
+    debugEl.textContent = 'URL: ' + window.location.href;
+    document.body.appendChild(debugEl);
+
     var hash = window.location.hash.substring(1);
     if (hash && hash.indexOf('access_token') !== -1) {
       // Returning from Spotify with token
