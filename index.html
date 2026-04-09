@@ -48,7 +48,7 @@
     clientIdInput.onchange = function() { localStorage.setItem('custom_client_id', clientIdInput.value.trim()); };
 
     function getActiveClientId() {
-      return clientIdInput.value.trim() || DEFAULT_CLIENT_ID;
+      return clientIdInput.value.trim() || sessionStorage.getItem('pkce_client_id') || DEFAULT_CLIENT_ID;
     }
 
     // --- PKCE helpers ---
@@ -121,6 +121,7 @@
         }        
         var verifier = generateRandom(64);
         sessionStorage.setItem('pkce_verifier', verifier);
+        sessionStorage.setItem('pkce_client_id', getActiveClientId());
         sha256(verifier).then(function(challenge) {
           var authUrl = 'https://accounts.spotify.com/authorize' +
             '?client_id=' + encodeURIComponent(getActiveClientId()) +
